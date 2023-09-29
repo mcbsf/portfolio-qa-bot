@@ -24,6 +24,10 @@ class Question (BaseModel):
 async def get_answer(question: Question):
     return qa.get_answer(question.question)
 
+@app.get("/health/")
+async def get_answer():
+    return {"Ok": "worked!"}
+
 qa = QABot()
 
 def lambda_handler(event, context):
