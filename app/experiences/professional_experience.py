@@ -1,4 +1,4 @@
-[
+prof_exp = """[
     {
         "company": "Creditas",
         "position": "Sr Software Engineer",
@@ -101,4 +101,4 @@
             "Software Developer in a company that managed specific taxes from organizations"
         ]
     }
-]
+]"""
