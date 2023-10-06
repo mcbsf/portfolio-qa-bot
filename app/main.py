@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "*"
+    "https://mariosoftware.solutions"
 ]
 
 app.add_middleware(
