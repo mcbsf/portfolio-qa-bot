@@ -60,6 +60,12 @@ class QABot:
         self.qa_bot = qa
 
     def get_answer(self, question):
-        answer = self.qa_bot.run(question)
-        return answer
+        answer = "algum erro ocorreu"
+        try:
+        
+            answer = self.qa_bot.run(question)
+        except Exception as e:
+            pass
+        finally:
+            return answer
         
