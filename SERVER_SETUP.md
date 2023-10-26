@@ -1,4 +1,4 @@
-## Deployment Instructions
+## SETUP Instructions
 
 Assuming you have an EC2 instance with Nginx and Certbot already installed, follow these commands to deploy your FastAPI application:
 
