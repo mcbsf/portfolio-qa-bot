@@ -1,4 +1,4 @@
-# FastAPI Q&A Bot using Langchain
+# Portfolio Q&A Bot using Langchain
 
 This is a FastAPI application that utilizes Langchain to answer questions based on documents stored in the "app/experiences" folder. Each document is stored as a `.py` file containing JSON strings to be processed by Langchain.
 
