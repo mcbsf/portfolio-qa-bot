@@ -1,75 +1,68 @@
-# portfolio-qa-bot
+# FastAPI Q&A Bot using Langchain
 
-nginx server:
-                 
-server {
-    server_name api4mariosoftware.xyz www.api4mariosoftware.xyz;
+This is a FastAPI application that utilizes Langchain to answer questions based on documents stored in the "app/experiences" folder. Each document is stored as a `.py` file containing JSON strings to be processed by Langchain.
 
-    location / {
-        if ($request_method = OPTIONS) {
-            # Respond with 200 OK for OPTIONS requests
-            add_header 'Access-Control-Allow-Origin' 'https://mariosoftware.solutions';
-            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-            add_header 'Access-Control-Allow-Headers' '*';
-            add_header 'Content-Length' 0;
-            return 200;
-        }
+## Project Structure
 
-        # Handle other HTTP methods and CORS headers
-        proxy_pass http://127.0.0.1:8000; # Assuming your FastAPI app runs on port 8000
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_read_timeout 60;
-        proxy_connect_timeout 60;
-        proxy_redirect off;
+The project structure is organized as follows:
 
-        # CORS headers for non-OPTIONS requests
-        add_header 'Access-Control-Allow-Origin' 'https://mariosoftware.solutions';
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-        add_header 'Access-Control-Allow-Headers' '*';
+- `app/`: The main application folder.
+  - `experiences/`: Contains documents in `.py` files as JSON strings to be processed.
+  - `main.py`: The entry point for the FastAPI application.
+  - `qa_bot.py`: Contains the code for answering questions using Langchain.
 
-        # Allow the use of websockets
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
+- `tests/`: Contains JSON files used for running tests against the API.
 
+## Local Setup
 
-then
-sudo certbot --nginx -d api4mariosoftware.xyz -d www.api4mariosoftware.xyz
+To run the FastAPI application locally, follow these steps inside the repository root:
 
-then change certbot options to:
+1. Create a virtual environment using `virtualenv`:
 
+    ```bash
+    virtualenv venv
+    ```
 
+2. Activate the virtual environment:
 
+    ```bash
+    source venv/bin/activate
+    ```
 
-.
-.
-.
+3. Install the required dependencies using `pip`:
 
-    # SSL certificate configuration managed by Certbot
-    listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/api4mariosoftware.xyz/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api4mariosoftware.xyz/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-}
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-server {
-    if ($host = www.api4mariosoftware.xyz) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
+4. Navigate to the `app` folder:
 
-    if ($host = api4mariosoftware.xyz) {
-        return 301 https://$host$request_uri;
-    } # managed by Certbot
+    ```bash
+    cd app
+    ```
 
-    # HTTP server configuration (redirect to HTTPS)
-    server_name api4mariosoftware.xyz www.api4mariosoftware.xyz;
-    listen 80;
-    return 404; # managed by Certbot
-}
+5. Start the FastAPI application using `uvicorn`:
+
+    ```bash
+    uvicorn main:app
+    ```
+
+The API will be available at `http://localhost:8000`.
+
+## Using the API
+
+To get answers to questions, make a POST request to `http://localhost:8000/get_answer` with a JSON payload containing the "question" attribute. The API will respond with answers based on the provided question and documents in the "app/experiences" folder.
+
+## API Validation
+
+This project utilizes Pydantic to validate API calls, ensuring that the data sent to the API is in the expected format.
+
+## Testing
+
+You can run tests against the API using the JSON files in the `tests` folder. These test files contain sample input data for various questions to verify the functionality of your Q&A bot.
+
+## Deployment
+
+For deployment instructions, refer to the `deploy.md` file in the repository.
+
+Feel free to customize this README with more specific information about your project and any additional details you'd like to provide.
