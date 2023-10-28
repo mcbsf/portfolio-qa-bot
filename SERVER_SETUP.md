@@ -49,25 +49,14 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
     }
     ```
 
-3. Create a symbolic link to enable the Nginx site configuration:
 
-    ```bash
-    sudo ln -s /etc/nginx/sites-available/api4mariosoftware /etc/nginx/sites-enabled/ -f
-    ```
-
-4. Restart Nginx to apply the changes:
-
-    ```bash
-    sudo systemctl restart nginx
-    ```
-
-5. Obtain an SSL certificate for your domain using Certbot:
+3. Obtain an SSL certificate for your domain using Certbot:
 
     ```bash
     sudo certbot --nginx -d api4mariosoftware.xyz -d www.api4mariosoftware.xyz
     ```
 
-6. After obtaining the SSL certificate, open the Nginx configuration file again and make the following changes:
+4. After obtaining the SSL certificate, open the Nginx configuration file again and make the following changes:
 
     ```nginx
     listen 443 ssl;
@@ -77,8 +66,19 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
     ```
 
-7. Save the Nginx configuration file and exit the text editor.
+5. Save the Nginx configuration file and exit the text editor.
 
+6. Create a symbolic link to enable the Nginx site configuration:
+
+    ```bash
+    sudo ln -s /etc/nginx/sites-available/api4mariosoftware /etc/nginx/sites-enabled/ -f
+    ```
+
+7. Restart Nginx to apply the changes:
+
+    ```bash
+    sudo systemctl restart nginx
+    ```
 8. Navigate to your FastAPI application folder:
 
     ```bash
