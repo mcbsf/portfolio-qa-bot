@@ -1,7 +1,88 @@
 ## SETUP Instructions
 
+### Installations
+1. prepare for app:
+
+    ```bash
+    sudo apt install python3-dev
+    sudo apt-get install build-essential -y
+    ```
+2. install nginx and certbot:
+    ```bash
+    sudo apt install nginx
+    sudo apt install certbot python3-certbot-nginx 
+    ```
+install nginx, pip and certbot
 Assuming you have an EC2 instance with Nginx and Certbot already installed, follow these commands to deploy your FastAPI application:
 
+### Configuring and running the server
+set nginx.conf
+    ```bash
+    cd /etc/nginx
+    sudo nano nginx.conf 
+
+    user www-data;
+    worker_processes auto;
+    pid /run/nginx.pid;
+    include /etc/nginx/modules-enabled/*.conf;
+
+    events {
+            worker_connections 768;
+            # multi_accept on;
+    }
+
+    http {
+
+            ##
+            # Basic Settings
+            ##
+
+            sendfile on;
+            tcp_nopush on;
+            types_hash_max_size 2048;
+            # server_tokens off;
+
+            # server_names_hash_bucket_size 64;
+            # server_name_in_redirect off;
+
+            include /etc/nginx/mime.types;
+            default_type application/octet-stream;
+
+            ##
+            # SSL Settings
+            ##
+
+            ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+            ssl_prefer_server_ciphers on;
+
+            ##
+            # Logging Settings
+            ##
+
+            access_log /var/log/nginx/access.log;
+            error_log /var/log/nginx/error.log;
+
+            ##
+            # Gzip Settings
+            ##
+
+            gzip on;
+
+            # gzip_vary on;
+            # gzip_proxied any;
+            # gzip_comp_level 6;
+            # gzip_buffers 16 8k;
+            # gzip_http_version 1.1;
+            # gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+            ##
+            # Virtual Host Configs
+            ##
+
+            include /etc/nginx/conf.d/*.conf;
+            include /etc/nginx/sites-enabled/*.*;
+    }
+    ```
 1. Change directory to `/etc/nginx/sites-available/`:
 
     ```bash
@@ -56,9 +137,9 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
     sudo certbot --nginx -d api4mariosoftware.xyz -d www.api4mariosoftware.xyz
     ```
 
-4. After obtaining the SSL certificate, open the Nginx configuration file again and make the following changes:
+4. After obtaining the SSL certificate, open the Nginx configuration file again and make the following changes outside location, inside servers:
 
-    ```nginx
+    ```bash
     listen 443 ssl;
     ssl_certificate /etc/letsencrypt/live/api4mariosoftware.xyz/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/api4mariosoftware.xyz/privkey.pem;
@@ -71,7 +152,7 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
 6. Create a symbolic link to enable the Nginx site configuration:
 
     ```bash
-    sudo ln -s /etc/nginx/sites-available/api4mariosoftware /etc/nginx/sites-enabled/ -f
+    sudo ln -s /etc/nginx/sites-available/api4mariosoftware.xyz /etc/nginx/sites-enabled/ -f
     ```
 
 7. Restart Nginx to apply the changes:
@@ -92,5 +173,5 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
     ```
 
 Your FastAPI application should now be up and running, accessible via HTTPS at `https://api4mariosoftware.xyz` and `https://www.api4mariosoftware.xyz`.
-
+                                          
 Remember to replace `/path/to/your/app` with the actual path to your application folder and adjust the domain and SSL paths as necessary.
