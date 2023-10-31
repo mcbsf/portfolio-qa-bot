@@ -1,3 +1,4 @@
+import datetime
 from langchain.document_loaders.unstructured import UnstructuredFileLoader 
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
@@ -16,17 +17,26 @@ class LLMValidationException(Exception):
 
 class QABot:
     
-    def __init__(self, name, email):
+    def __init__(self, name, email, first_company):
         self.name = name
         self.email = email
+        self.prof_exp = prof_exp
+        self.academic_exp = academic_exp
+        self.first_company = first_company
+        
+        self.format_experience_to_calculate_time()
         self.generate_qa_bot()
+
+    def format_experience_to_calculate_time(self):
+        self.prof_exp = self.prof_exp.replace("PRESENT", datetime.datetime.now().strftime("%B %Y")) 
+        self.academic_exp = self.academic_exp.replace("PRESENT", datetime.datetime.now().strftime("%B %Y")) 
 
     def generate_qa_bot(self):
         text = f"""act like a information retrieval of 2 given jsons about {self.name} experiences, 1 json about professional experiences and other json about academic experiences. answer questions based on information of the given JSONs, dont create or make up an answer. If the information is not in json, explicitly say 'information not available in given content'.  |
         
         About false positive answers, do not respond something similar to the question if its not directly correlated. If doing so, say it's not the proper answer. Example: if questioned about the projects of Mario, since projects are not listed in given data, You can't say the companies names as answer unless it's said that isn't the proper answer.  |
         
-        If asked about experience time, consider internship development as professional experience, also includes 1 year of scientific research. 
+        If asked about professional experience time, consider internship development as professional experience time, consider the experience time beggining at {self.first_company} company
 
         If asked to hire the {self.name}, say to contact him by any contact given in his portfolio or mailing to {self.email}
 
@@ -42,7 +52,7 @@ class QABot:
             5 - responsabilities - detailed responsabilities of the experience |
             |
             The professional experiences is in tripple squared brackets. |
-            [[[{prof_exp}]]] |
+            [[[{self.prof_exp}]]] |
 
             THe academic experiences JSON is an array of experiences, each experience is an object inside the array. each experience contains 4 attributes: |
             |

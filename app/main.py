@@ -8,7 +8,8 @@ app = FastAPI()
 
 qa = QABot(
     name = "Mario Cardoso",
-    email = "mario.cardoso.solutions@gmail.com"
+    email = "mario.cardoso.solutions@gmail.com",
+    first_company="BisaWeb"
 )
 class Question (BaseModel):
     question: str
