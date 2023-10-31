@@ -6,6 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+qa = QABot(
+    name = "Mario Cardoso",
+    email = "mario.cardoso.solutions@gmail.com"
+)
 class Question (BaseModel):
     question: str
 
@@ -17,7 +21,6 @@ async def get_answer(question: Question):
 async def get_answer():
     return {"Ok": "worked!"}
 
-qa = QABot()
 
 def lambda_handler(event, context):
     print("asking")
