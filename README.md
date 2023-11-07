@@ -35,16 +35,10 @@ To run the FastAPI application locally, follow these steps inside the repository
     pip install -r requirements.txt
     ```
 
-4. Navigate to the `app` folder:
-
-    ```bash
-    cd app
-    ```
-
 5. Start the FastAPI application using `uvicorn`:
 
     ```bash
-    uvicorn main:app
+    uvicorn app.main:app --reload
     ```
 
 The API will be available at `http://localhost:8000`.
