@@ -54,8 +54,7 @@ jobs:
         pip install -r app/requirements.txt;
     - name: Test application
       run: |
-        cd app
-        uvicorn main:app 
+        uvicorn app.main:app 
         sleep 5
         curl http://127.0.0.1:8000/health | grep "worked!"
       
