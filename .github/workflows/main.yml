@@ -50,13 +50,13 @@ jobs:
 
       - name: Turn off uvicorn server
         run: |
-            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'kill -9 $(lsof -ti :8000)'
+            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'ps -ef | grep '[u]vicorn.*:8000' | awk '{print $2}' | xargs -r kill -9'
   
       - name: Update code
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && git pull origin main'
 
-      - name: Update code
+      - name: Install requirements
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && pip install -r requirements.txt'
 
