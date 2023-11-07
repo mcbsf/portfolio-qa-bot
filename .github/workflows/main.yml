@@ -29,7 +29,7 @@ jobs:
         pip install -r app/requirements.txt;
     - name: Test with pytest
       run: |
-        if [ -d tests ] || [ -d test ]; then python -m pytest; fi
+        if [ -d tests ] || [ -d test ]; then python -m pytest tests/tests.py; fi
 
 
   Test-Local:
