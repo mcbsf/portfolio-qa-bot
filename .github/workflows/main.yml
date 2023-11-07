@@ -62,5 +62,5 @@ jobs:
 
       - name: Turn on uvicorn server
         run: |
-            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && nohup uvicorn app.main:app --workers 8 > uvicorn.log 2>&1 &'
+            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && nohup uvicorn app.main:app --workers 4 > uvicorn.log 2>&1 &'
     
