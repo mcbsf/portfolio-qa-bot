@@ -24,7 +24,7 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
 
     Inside the file, add the following Nginx server configuration:
 
-    ```nginx
+    ```
     user www-data;
     worker_processes auto;
     pid /run/nginx.pid;
@@ -97,7 +97,7 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
 
     Inside the file, add the following Nginx server configuration:
 
-    ```nginx
+    ```
     server {
         server_name api4mariosoftware.xyz www.api4mariosoftware.xyz;
 
@@ -140,17 +140,18 @@ Assuming you have an EC2 instance with Nginx and Certbot already installed, foll
 4. After obtaining the SSL certificate, open the Nginx configuration file again and make the following changes outside location, inside servers:
 
     ```
-    nginx
-    ...
-    location {
+    server{
         ...
+            location {
+                ...
+            }
+        ...
+        listen 443 ssl;
+        ssl_certificate /etc/letsencrypt/live/api4mariosoftware.xyz/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/api4mariosoftware.xyz/privkey.pem;
+        include /etc/letsencrypt/options-ssl-nginx.conf;
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
     }
-    ...
-    listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/api4mariosoftware.xyz/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api4mariosoftware.xyz/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
     ```
 
 
