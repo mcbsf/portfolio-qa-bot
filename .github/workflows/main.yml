@@ -29,7 +29,7 @@ jobs:
         pip install -r app/requirements.txt;
     - name: Test with pytest
       run: |
-        if [ -d tests ] || [ -d test ]; then python -m pytest tests/tests.py; fi
+        if [ -d tests ] || [ -d test ]; then OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} python -m pytest tests/tests.py; fi
 
 
   Test-Local:

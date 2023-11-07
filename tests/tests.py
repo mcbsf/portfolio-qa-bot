@@ -1,7 +1,7 @@
 
 
 from app.qa_bot import QABot
-
+import os
 
 def test_app():
     qa_bot = QABot(
