@@ -54,6 +54,7 @@ jobs:
         pip install -r app/requirements.txt;
     - name: Test application
       run: |
+        export OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}}
         uvicorn app.main:app 
         sleep 5
         curl http://127.0.0.1:8000/health | grep "worked!"
