@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from qa_bot import QABot
+from app.qa_bot import QABot
 
 from fastapi.middleware.cors import CORSMiddleware
 

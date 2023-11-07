@@ -29,8 +29,6 @@ jobs:
         pip install -r app/requirements.txt;
     - name: Test with pytest
       run: |
-        sudo apt install python3-dev
-        sudo apt-get install build-essential -y
         if [ -d tests ] || [ -d test ]; then python -m pytest; fi
 
 

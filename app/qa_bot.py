@@ -6,8 +6,8 @@ from langchain.vectorstores import Chroma
 from langchain.chains import VectorDBQA
 from langchain.chat_models import ChatOpenAI
 from langchain.docstore.document import Document
-from experiences.professional_experience import prof_exp
-from experiences.academic_experience import academic_exp
+from app.experiences.professional_experience import prof_exp
+from app.experiences.academic_experience import academic_exp
 
 
 doc =  Document(page_content="text", metadata={"source": "local"})
