@@ -18,14 +18,13 @@ We welcome contributions in the form of pull requests (PRs). To submit a PR:
 2. **Clone Your Fork:**
    - Clone your forked repository to your local machine:
 
-   ```bash
+   ```
    git clone https://github.com/your-username/your-project.git
    ```
 3. **Create a New Branch:**
 
     Create a new branch for your changes. Please use a descriptive name for your branch:
     ```
-    bash
     git checkout -b feature/your-feature
     ```
 4. **Make Your Changes:**
@@ -40,13 +39,12 @@ We welcome contributions in the form of pull requests (PRs). To submit a PR:
 
     Commit your changes with a clear and concise message:
     ```
-    bash
     git commit -am "Add your informative commit message here"
     ```
 7. **Push Your Changes:** 
 
     Push your changes to your fork on GitHub:
-    ```bash
+    ```
     git push origin feature/your-feature
     ```
 8. **Create a Pull Request:**
@@ -59,6 +57,3 @@ Provide a detailed description of your changes in the PR description. Include an
 10. **Review and Discuss:**
 
 Be prepared to engage in discussions with maintainers and other contributors if necessary.
-
-11. **Continuous Integration (CI):**
-    The full CI/CD flux isnt fully automated yet. At least once in a month I'll be deploying new functionalities if passed properly during tests.
