@@ -2,10 +2,12 @@
 
 This is a FastAPI application that utilizes Langchain to answer questions based on documents stored in the "app/experiences" folder. Each document is stored as a `.py` file containing JSON strings to be processed by Langchain.
 
+There's a full cycle of CI/CD implemented with Github Actions.
+
 ## Project Structure
 
 The project structure is organized as follows:
-
+- `.github/workflows`: The CI/CD implementation
 - `app/`: The main application folder.
   - `experiences/`: Contains documents in `.py` files as JSON strings to be processed.
   - `main.py`: The entry point for the FastAPI application.
@@ -55,8 +57,6 @@ This project utilizes Pydantic to validate API calls, ensuring that the data sen
 
 You can run tests against the API using the JSON files in the `tests` folder. These test files contain sample input data for various questions to verify the functionality of your Q&A bot.
 
-## Deployment
+## Contribution
 
-For deployment instructions, refer to the `deploy.md` file in the repository.
-
-Feel free to customize this README with more specific information about your project and any additional details you'd like to provide.
+Please read the CONTRIBUTING.md for instructions
