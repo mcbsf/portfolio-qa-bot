@@ -57,3 +57,44 @@ Provide a detailed description of your changes in the PR description. Include an
 10. **Review and Discuss:**
 
 Be prepared to engage in discussions with maintainers and other contributors if necessary.
+
+
+## Reporting Issues
+
+If you come across any issues or bugs in the Portfolio Q&A Bot, we appreciate your help in bringing them to our attention. To report an issue:
+
+1. **Check Existing Issues:**
+   - Before creating a new issue, please check if a similar issue already exists in the [issue tracker](https://github.com/your-username/your-project/issues).
+
+2. **Create a New Issue:**
+   - If your issue is not already reported, click on the "New Issue" button.
+   - Clearly describe the issue, including steps to reproduce it.
+
+3. **Provide Details:**
+   - Include as much relevant information as possible, such as your operating system, browser, and any error messages you encountered.
+
+4. **Label Your Issue:**
+   - Apply appropriate labels to categorize your issue, such as "bug," "enhancement," or "help wanted."
+
+5. **Be Responsive:**
+   - Be responsive to any follow-up questions or requests for additional information from maintainers.
+
+
+## Coding Standards and Guidelines
+
+To maintain a consistent and high-quality codebase, we follow a set of coding standards and guidelines. Before submitting a pull request, please ensure your code adheres to these standards:
+
+1. **Coding Style:**
+   - Follow the coding style used throughout the project. This includes indentation, naming conventions, and code organization.
+
+2. **Documentation:**
+   - Document your code thoroughly. Include comments where necessary and update documentation if your changes affect existing functionality.
+
+3. **Testing:**
+   - Write tests for your code to ensure it functions as intended. Make sure existing tests pass with your changes.
+
+4. **Branch Naming:**
+   - Use descriptive and meaningful names for your branches. Prefix feature branches with "feature/" and bug fix branches with "bugfix/".
+
+5. **Commit Messages:**
+   - Write clear and informative commit messages. A well-written commit message helps everyone understand the purpose of your changes.
