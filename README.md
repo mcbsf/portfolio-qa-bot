@@ -57,6 +57,6 @@ This project utilizes Pydantic to validate API calls, ensuring that the data sen
 
 You can run tests against the API using the JSON files in the `tests` folder. These test files contain sample input data for various questions to verify the functionality of your Q&A bot.
 
-## Contribution
+## Contribution 
 
 Please read the CONTRIBUTING.md for instructions
