@@ -52,14 +52,25 @@ jobs:
         run: |
             ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'ps -ef | grep '[u]vicorn.*:8000' | awk '{print $2}' | xargs -r kill -9'
   
-      - name: Update code
+      - name: Ensure repo exists and update code
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && git pull origin main'
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
+            if [ -d "$HOME/portfolio-qa-bot/.git" ]; then
+              cd "$HOME/portfolio-qa-bot" && git pull origin main;
+            else
+              cd "$HOME" && git clone git@github.com:mcbsf/portfolio-qa-bot.git portfolio-qa-bot;
+            fi
+          '
 
-      - name: Install requirements
+      - name: Install requirements (create venv if needed)
         run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && pip install -r requirements.txt'
-
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
+            cd "$HOME/portfolio-qa-bot" && \
+            if [ ! -d "venv" ]; then python3 -m venv venv; fi && \
+            source venv/bin/activate && \
+            pip install --upgrade pip && \
+            pip install -r requirements.txt
+          '
       - name: Turn on uvicorn server
         run: |
             ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && nohup uvicorn app.main:app --workers 4 > uvicorn.log 2>&1 &'
