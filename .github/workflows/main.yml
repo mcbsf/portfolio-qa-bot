@@ -65,11 +65,25 @@ jobs:
       - name: Install requirements (create venv if needed)
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
-            cd "$HOME/portfolio-qa-bot" && \
-            if [ ! -d "venv" ]; then python3 -m venv venv; fi && \
-            source venv/bin/activate && \
-            pip install --upgrade pip && \
+            set -e
+
+            # Make sure venv support is installed on Ubuntu/Debian
+            sudo apt-get update -y
+            sudo apt-get install -y python3-venv python3-pip
+
+            cd "$HOME/portfolio-qa-bot"
+
+            # Create venv if it doesn\'t exist
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+
+            # Activate venv and install deps
+            . venv/bin/activate
+            pip install --upgrade pip
             pip install -r requirements.txt
+          '
+
           '
       - name: Turn on uvicorn server
         run: |
