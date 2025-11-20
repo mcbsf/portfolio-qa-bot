@@ -76,18 +76,15 @@ jobs:
 
             cd "$HOME/portfolio-qa-bot"
 
-            # Install Python 3.11 via uv (managed, no apt)
-            uv python install 3.11
-
             # Create / reuse venv using Python 3.11
             if [ ! -d "venv" ]; then
               uv venv --python 3.11 venv
             fi
 
             # Activate venv and install deps
-            . venv/bin/activate
-            python -m pip install --upgrade pip
-            python -m pip install -r requirements.txt
+            source venv/bin/activate
+            uv pip install --upgrade pip
+            uv pip install -r requirements.txt
           '
 
 
