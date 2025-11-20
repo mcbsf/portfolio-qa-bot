@@ -40,62 +40,38 @@ jobs:
 
     steps:
 
-      - name: Deploy
-        run: echo I am deploying the api to AWS
+      - name: Check out code
+        uses: actions/checkout@v2
 
       - name: Set permissions for private key
         run: |
           echo "${{ secrets.PRIVATE_KEY }}" > key.pem
           chmod 600 key.pem
 
-      - name: Turn off uvicorn server
-        run: |
-            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'ps -ef | grep '[u]vicorn.*:8000' | awk '{print $2}' | xargs -r kill -9'
-  
-      - name: Ensure repo exists and update code
+      - name: Stop old container and build/run new Docker image
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
-            if [ -d "$HOME/portfolio-qa-bot/.git" ]; then
-              cd "$HOME/portfolio-qa-bot" && git pull origin main;
-            else
-              cd "$HOME" && git clone git@github.com:mcbsf/portfolio-qa-bot.git portfolio-qa-bot;
-            fi
-          '
-
-      - name: Install requirements with uv (Python 3.11)
-        run: |
-          ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
-            # Stop on explicit failures we check for
-            set -u
-
-            # Ensure uv is installed
-            export PATH="$HOME/.local/bin:$PATH"
-            if ! command -v uv >/dev/null 2>&1; then
-              curl -LsSf https://astral.sh/uv/install.sh | sh
-              export PATH="$HOME/.local/bin:$PATH"
-            fi
-
+            set -e
+            
             cd "$HOME/portfolio-qa-bot"
-
-            # Ensure Python 3.11 is available via uv
-            if ! uv python list | grep -q "3.11"; then
-              uv python install 3.11 || { echo "uv python install 3.11 failed"; exit 1; }
-            fi
-
-            # Create / reuse venv at .venv using Python 3.11
-            if [ ! -d ".venv" ]; then
-              uv venv --python 3.11 .venv || { echo "uv venv failed"; exit 1; }
-            fi
-
-            # Activate venv and install deps with pip
-            . .venv/bin/activate
-            uv pip install --upgrade pip
-            uv pip install -r requirements.txt
+            
+            # Stop and remove old container if running
+            docker stop portfolio-qa-bot || true
+            docker rm portfolio-qa-bot || true
+            
+            # Pull latest code
+            git pull origin main
+            
+            # Build the Docker image
+            docker build -t portfolio-qa-bot:latest .
+            
+            # Run the container
+            docker run -d \
+              --name portfolio-qa-bot \
+              -p 8000:8000 \
+              -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
+              portfolio-qa-bot:latest
+            
+            # Verify container is running
+            docker ps | grep portfolio-qa-bot
           '
-
-
-
-      - name: Turn on uvicorn server
-        run: |
-            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source .venv/bin/activate && nohup uvicorn app.main:app --workers 4 > uvicorn.log 2>&1 &'
-    
