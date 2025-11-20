@@ -62,29 +62,35 @@ jobs:
             fi
           '
 
-      - name: Install requirements (create venv if needed)
+      - name: Install requirements with uv (Python 3.11)
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
             set -e
 
-            # Make sure venv support is installed on Ubuntu/Debian
-            sudo apt-get update -y
-            sudo apt-get install -y python3-venv python3-pip
+            # Ensure uv is installed
+            export PATH="$HOME/.local/bin:$PATH"
+            if ! command -v uv >/dev/null 2>&1; then
+              curl -LsSf https://astral.sh/uv/install.sh | sh
+              export PATH="$HOME/.local/bin:$PATH"
+            fi
 
             cd "$HOME/portfolio-qa-bot"
 
-            # Create venv if it doesn\'t exist
+            # Install Python 3.11 via uv (managed, no apt)
+            uv python install 3.11
+
+            # Create / reuse venv using Python 3.11
             if [ ! -d "venv" ]; then
-              python3 -m venv venv
+              uv venv --python 3.11 venv
             fi
 
             # Activate venv and install deps
             . venv/bin/activate
-            pip install --upgrade pip
-            pip install -r requirements.txt
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements.txt
           '
 
-          '
+
       - name: Turn on uvicorn server
         run: |
             ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && nohup uvicorn app.main:app --workers 4 > uvicorn.log 2>&1 &'
