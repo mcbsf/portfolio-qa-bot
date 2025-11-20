@@ -65,7 +65,8 @@ jobs:
       - name: Install requirements with uv (Python 3.11)
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} '
-            set -e
+            # Stop on explicit failures we check for
+            set -u
 
             # Ensure uv is installed
             export PATH="$HOME/.local/bin:$PATH"
@@ -76,19 +77,25 @@ jobs:
 
             cd "$HOME/portfolio-qa-bot"
 
-            # Create / reuse venv using Python 3.11
-            if [ ! -d "venv" ]; then
-              uv venv --python 3.11 venv
+            # Ensure Python 3.11 is available via uv
+            if ! uv python list | grep -q "3.11"; then
+              uv python install 3.11 || { echo "uv python install 3.11 failed"; exit 1; }
             fi
 
-            # Activate venv and install deps
-            source venv/bin/activate
-            uv pip install --upgrade pip
-            uv pip install -r requirements.txt
+            # Create / reuse venv at .venv using Python 3.11
+            if [ ! -d ".venv" ]; then
+              uv venv --python 3.11 .venv || { echo "uv venv failed"; exit 1; }
+            fi
+
+            # Activate venv and install deps with pip
+            . .venv/bin/activate
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements.txt
           '
+
 
 
       - name: Turn on uvicorn server
         run: |
-            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source venv/bin/activate && nohup uvicorn app.main:app --workers 4 > uvicorn.log 2>&1 &'
+            ssh -o StrictHostKeyChecking=no -i key.pem ${{secrets.USER_NAME}}@${{secrets.HOST_NAME}} 'cd portfolio-qa-bot && source .venv/bin/activate && nohup uvicorn app.main:app --workers 4 > uvicorn.log 2>&1 &'
     
