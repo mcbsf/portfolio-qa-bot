@@ -1,183 +1,246 @@
-## SETUP Instructions
+{{
 
-### Installations
-1. prepare for app:
+## Server Setup – Nginx + HTTPS (Let’s Encrypt) + Route 53
 
-    ```bash
-    sudo apt install python3-dev
-    sudo apt-get install build-essential -y
-    ```
-2. install nginx and certbot:
-    ```bash
-    sudo apt install nginx
-    sudo apt install certbot python3-certbot-nginx 
-    ```
-install nginx, pip and certbot
-Assuming you have an EC2 instance with Nginx and Certbot already installed, follow these commands to deploy your FastAPI application:
+> **Scope:** This doc assumes:
+>
+> * App build, clone, Docker, etc. are handled by CI/CD.
+> * Your app is exposed on the EC2 instance at **[http://127.0.0.1:8000](http://127.0.0.1:8000)** (via Docker or directly with Uvicorn).
+> * You just need to configure **Nginx**, **Certbot**, and **DNS (Route 53)** for `api4mariosoftware.xyz`.
 
-### Configuring and running the server
-1. edit set nginx config file:
-    ```bash
-    cd /etc/nginx
-    sudo nano nginx.conf 
-    ```
+---
 
-    Inside the file, add the following Nginx server configuration:
+## 0. One-time checks (run on EC2)
 
-    ```
-    user www-data;
-    worker_processes auto;
-    pid /run/nginx.pid;
-    include /etc/nginx/modules-enabled/*.conf;
+Run these once to understand your environment (for debugging / future reference):
 
-    events {
-            worker_connections 768;
-            # multi_accept on;
+```bash
+# Check OS (Ubuntu etc.)
+lsb_release -a || cat /etc/os-release
+
+# Check Nginx status
+sudo systemctl status nginx
+
+# See what’s listening on ports 80 and 8000
+sudo ss -ltnp | egrep ':80|:8000' || true
+```
+
+You want this final state after setup:
+
+* `nginx` listening on **80** and **443**
+* Your app (or Docker proxy) listening on **127.0.0.1:8000**
+
+---
+
+## 1. Route 53 – DNS configuration
+
+In Route 53, for the hosted zone `api4mariosoftware.xyz`:
+
+1. **A record for root domain**
+
+   * **Name:** `api4mariosoftware.xyz`
+   * **Type:** `A`
+   * **Value:** EC2 public IP (e.g. `34.228.56.179`)
+   * **TTL:** `300` (or similar)
+
+2. **CNAME for `www`**
+
+   * **Name:** `www.api4mariosoftware.xyz`
+   * **Type:** `CNAME`
+   * **Value:** `api4mariosoftware.xyz`
+   * **TTL:** `300`
+
+Wait a few minutes so DNS propagates, then test locally:
+
+```bash
+nslookup api4mariosoftware.xyz
+nslookup www.api4mariosoftware.xyz
+```
+
+Both should resolve to the EC2 public IP.
+
+---
+
+## 2. Install Nginx & Certbot on EC2
+
+On the EC2 instance (Ubuntu):
+
+```bash
+sudo apt update
+
+# Install Nginx
+sudo apt install -y nginx
+
+# Install Certbot + Nginx plugin
+sudo apt install -y certbot python3-certbot-nginx
+
+# Enable and start Nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+```
+
+Also make sure the EC2 **Security Group** allows inbound:
+
+* **HTTP (TCP 80, 0.0.0.0/0)**
+* **HTTPS (TCP 443, 0.0.0.0/0)**
+
+---
+
+## 3. Create Nginx site for `api4mariosoftware.xyz`
+
+Create a site config:
+
+```bash
+sudo nano /etc/nginx/sites-available/api4mariosoftware.xyz
+```
+
+Paste this:
+
+```nginx
+# HTTP server – used for ACME challenge and redirects
+server {
+    listen 80;
+    server_name api4mariosoftware.xyz www.api4mariosoftware.xyz;
+
+    # Let’s Encrypt validation path
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
     }
 
-    http {
-
-            ##
-            # Basic Settings
-            ##
-
-            sendfile on;
-            tcp_nopush on;
-            types_hash_max_size 2048;
-            # server_tokens off;
-
-            # server_names_hash_bucket_size 64;
-            # server_name_in_redirect off;
-
-            include /etc/nginx/mime.types;
-            default_type application/octet-stream;
-
-            ##
-            # SSL Settings
-            ##
-
-            ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
-            ssl_prefer_server_ciphers on;
-
-            ##
-            # Logging Settings
-            ##
-
-            access_log /var/log/nginx/access.log;
-            error_log /var/log/nginx/error.log;
-
-            ##
-            # Gzip Settings
-            ##
-
-            gzip on;
-
-            # gzip_vary on;
-            # gzip_proxied any;
-            # gzip_comp_level 6;
-            # gzip_buffers 16 8k;
-            # gzip_http_version 1.1;
-            # gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
-            ##
-            # Virtual Host Configs
-            ##
-
-            include /etc/nginx/conf.d/*.conf;
-            include /etc/nginx/sites-enabled/*.*;
+    # For everything else, redirect to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
     }
-    ```
+}
 
-2. Create or edit the Nginx server configuration file for your domain:
+# HTTPS server – reverse proxy to app on 127.0.0.1:8000
+server {
+    listen 443 ssl;
+    server_name api4mariosoftware.xyz www.api4mariosoftware.xyz;
 
-    ```bash
-    cd /etc/nginx/sites-available/
-    sudo nano api4mariosoftware.xyz
-    ```
+    # Certbot will manage these lines after first run, but keep placeholders:
+    ssl_certificate /etc/letsencrypt/live/api4mariosoftware.xyz/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api4mariosoftware.xyz/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    Inside the file, add the following Nginx server configuration:
-
-    ```
-    server {
-        server_name api4mariosoftware.xyz www.api4mariosoftware.xyz;
-
-        location / {
-            if ($request_method = OPTIONS) {
-                # Respond with 200 OK for OPTIONS requests
-                add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-                add_header 'Access-Control-Allow-Headers' '*';
-                add_header 'Content-Length' 0;
-                return 200;
-            }
-            # CORS headers for non-OPTIONS requests
+    # CORS + proxy to backend
+    location / {
+        # Preflight
+        if ($request_method = OPTIONS) {
             add_header 'Access-Control-Allow-Origin' '*';
             add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
             add_header 'Access-Control-Allow-Headers' '*';
-
-            # Handle other HTTP methods and CORS headers
-            proxy_pass http://127.0.0.1:8000; # Assuming your FastAPI app runs on port 8000
-            proxy_set_header X-Real-IP $remote_addr;
-
-            # Allow the use of websockets
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_set_header Host $host;
-            proxy_cache_bypass $http_upgrade;
+            add_header 'Content-Length' 0;
+            return 200;
         }
+
+        # CORS for actual requests
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' '*';
+
+        # Reverse proxy to app on 127.0.0.1:8000
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_cache_bypass $http_upgrade;
     }
-    ```
+}
+```
 
+Enable the site and test Nginx:
 
-3. Obtain an SSL certificate for your domain using Certbot:
+```bash
+# Enable site
+sudo ln -s /etc/nginx/sites-available/api4mariosoftware.xyz /etc/nginx/sites-enabled/ -f
 
-    ```bash
-    sudo certbot --nginx -d api4mariosoftware.xyz -d www.api4mariosoftware.xyz
-    ```
+# Optional: disable default site
+sudo rm -f /etc/nginx/sites-enabled/default
 
-4. After obtaining the SSL certificate, open the Nginx configuration file again and make the following changes outside location, inside servers:
+# Test config and reload
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
-    ```
-    server{
-        ...
-            location {
-                ...
-            }
-        ...
-        listen 443 ssl;
-        ssl_certificate /etc/letsencrypt/live/api4mariosoftware.xyz/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/api4mariosoftware.xyz/privkey.pem;
-        include /etc/letsencrypt/options-ssl-nginx.conf;
-        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-    }
-    ```
+Now `curl http://api4mariosoftware.xyz` should return a `301` redirect (will fail for HTTPS until we get a cert).
 
+---
 
-5. Create a symbolic link to enable the Nginx site configuration:
+## 4. Obtain and configure HTTPS certificate (Let’s Encrypt)
 
-    ```bash
-    sudo ln -s /etc/nginx/sites-available/api4mariosoftware.xyz /etc/nginx/sites-enabled/ -f
-    ```
+With Nginx serving on port 80 and DNS pointing correctly:
 
-6. Restart Nginx to apply the changes:
+```bash
+sudo certbot --nginx -d api4mariosoftware.xyz -d www.api4mariosoftware.xyz
+```
 
-    ```bash
-    sudo systemctl restart nginx
-    ```
-7. Navigate to your FastAPI application folder:
+When prompted:
 
-    ```bash
-    cd /path/to/your/app
-    ```
+* **Choose** option **2: Redirect** to force HTTP → HTTPS.
 
-9. Run the FastAPI application using `uvicorn`, assuming you have `nohup` installed to run the command in the background:
+Certbot will:
 
-    ```bash
-    nohup uvicorn main:app --workers 8 > uvicorn.log 2>&1 &
-    ```
+* Validate the domain via HTTP-01 on port 80.
+* Install certificates under `/etc/letsencrypt/live/api4mariosoftware.xyz/`.
+* Update the HTTPS server block with correct `ssl_certificate` and `ssl_certificate_key` lines.
+* Create/adjust an HTTP server block for redirection if needed.
 
-Your FastAPI application should now be up and running, accessible via HTTPS at `https://api4mariosoftware.xyz` and `https://www.api4mariosoftware.xyz`.
-                                          
-Remember to replace `/path/to/your/app` with the actual path to your application folder and adjust the domain and SSL paths as necessary.
+Verify:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+sudo certbot certificates
+```
+
+You should see:
+
+* A certificate for `api4mariosoftware.xyz` and `www.api4mariosoftware.xyz`
+* An expiry date ~90 days in the future
+
+Also check that Certbot auto-renew is active:
+
+```bash
+sudo systemctl status certbot.timer
+```
+
+---
+
+## 5. Final checks
+
+From your local machine:
+
+```bash
+# Check HTTP → HTTPS redirect
+curl -I http://api4mariosoftware.xyz
+
+# Check HTTPS directly
+curl -I https://api4mariosoftware.xyz
+
+# Optionally, hit an API route
+curl -X POST https://api4mariosoftware.xyz/get_answer \
+  -H "Content-Type: application/json" \
+  -d '{"question": "test"}'
+```
+
+In the browser:
+
+* Visit `https://api4mariosoftware.xyz`
+* Inspect the certificate:
+
+  * Issued by Let’s Encrypt
+  * Valid (not expired)
+  * Correct domain name
+
+At this point:
+
+* EC2 + Nginx + Certbot + Route 53 are fully configured.
+* Your CI/CD only needs to ensure the app is running on `127.0.0.1:8000` (e.g., Docker container with `-p 8000:8000`), and Nginx will handle HTTPS and routing.
+
+}}
