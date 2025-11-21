@@ -1,34 +1,71 @@
+
 academic_exp = '''
 [
     {
-        "school": "Bachelor's Degree at Universidade Federal de Pernambuco",
-        "course": "Computer Science",
-        "duration": "JULY 2013 - JULY 2020",
-        "description": "I hold a Bachelor's degree from the prestigious Center for Informatics (CIn) at the Federal University of Pernambuco (UFPE). My academic experience at CIn-UFPE equipped me with a comprehensive understanding of computer science principles, advanced programming techniques, and cutting-edge technologies. Through hands-on projects, team collaborations, and industry internships, I have developed strong problem-solving abilities, analytical thinking, and a passion for staying abreast of the latest advancements in the field. I am confident that my education and enthusiasm for technology make me a valuable asset for any challenging project or position in computer science."
+        "school": "Universidade Federal de Pernambuco (CIn-UFPE)",
+        "course": "Bachelor's Degree in Computer Science",
+        "duration": "JUNE 2013 - JULY 2021",
+        "description": "Bachelor's degree from the Center for Informatics (CIn-UFPE), with strong foundations in computer science, algorithms, data structures, software engineering, and artificial intelligence. Developed hands-on projects, worked in teams, and conducted research in AI and NLP."
     },
     {
         "school": "MOOC at Udemy",
-        "course": " HashiCorp Certified: Terraform Associate 2023",
+        "course": "HashiCorp Certified: Terraform Associate 2023 (prep course)",
         "duration": "JAN 2023 - MAY 2023",
-        "description": "Learned most of terraform functionalities, applying them in AWS as the course went through. Created ec2, iam_user, iam_policy, s3 bucket, bucket policy, elb, cloudfront, rds, security groups, etc. Also looked at non functional programming technicques in terraform, like data sensitive treats, scalabity, configuration files/commands, state lock, etc."
+        "description": "Learned most of Terraform functionalities, applying them in AWS while following the course. Created EC2, IAM users and policies, S3 buckets and policies, ELB, CloudFront, RDS, security groups, and more. Also studied sensitive data handling, scalability, configuration management, and state locking."
     },
     {
-        "school": "MOOC at StationX",
-        "course": "The Complete Cyber Security Course : Hackers Exposed!",
+        "school": "HashiCorp",
+        "course": "Terraform Associate 003 (Official Certification)",
+        "duration": "DEC 2023 - DEC 2025",
+        "description": "Official Terraform Associate 003 certification validating practical knowledge of infrastructure as code, state management, modules, workspaces, and best practices when using Terraform in production on cloud providers."
+    },
+    {
+        "school": "MOOC at StationX / Udemy",
+        "course": "The Complete Cyber Security Course: Hackers Exposed!",
         "duration": "FEB 2022 - FEB 2022",
-        "description": "An advanced practical skillset in defeating all online threats - advanced hackers, trackers, malware and all Internet nastiness including mitigating government spying and mass"
+        "description": "Developed practical skills to protect against online threats such as hackers, trackers, and malware, including basics of network security, encryption, and privacy tools."
     },
     {
-        "school": "MOOC at University of Washington",
-        "course": "Machine Learning Foundations",
-        "duration": "JUN 2020 - AGO 2020",
-        "description": "I reviewed the basics of one of things that what I love in IT: machine learning. I got a deeper understanding of the core ways in which machine learning can improve a business"
+        "school": "University of Washington (Coursera)",
+        "course": "Machine Learning Foundations: A Case Study Approach",
+        "duration": "JUN 2020 - AUG 2020",
+        "description": "Reviewed core concepts of machine learning using case studies. Strengthened understanding of supervised and unsupervised learning, model evaluation, and how ML can improve business outcomes."
     },
     {
-        "school": "MOOC at Hong Kong University",
+        "school": "Hong Kong University / Coursera",
         "course": "Front-End Web UI Frameworks and Tools",
-        "duration": "MAR 2020 - MAR 2020",
-        "description": "Reviewed the basics of UI, passing through the core of html, css and javascript manipulations"
+        "duration": "MAR 2020 - OCT 2020",
+        "description": "Reviewed the basics of UI and modern front-end development, covering HTML, CSS, JavaScript, and frameworks such as Bootstrap. Practiced building responsive web interfaces."
+    },
+    {
+        "school": "MOOC at Udemy",
+        "course": "Spark 3",
+        "duration": "JAN 2024 - JAN 2024",
+        "description": "Hands-on course covering Apache Spark 3 fundamentals, RDDs, DataFrames, and performance considerations for batch and streaming data workloads."
+    },
+    {
+        "school": "MOOC at Udemy",
+        "course": "Mastering Data Modeling Fundamentals",
+        "duration": "FEB 2024 - FEB 2024",
+        "description": "Studied conceptual, logical, and physical data modeling, normalization, dimensional modeling, and best practices for analytics and OLTP databases."
+    },
+    {
+        "school": "MOOC at Udemy",
+        "course": "Software Architecture & Design of Modern Large Scale Systems",
+        "duration": "MAR 2024 - MAR 2024",
+        "description": "Focused on software architecture patterns and large-scale system design, including scalability, availability, fault tolerance, and best practices for modern distributed systems."
+    },
+    {
+        "school": "MOOC at Udemy",
+        "course": "The Complete Hands-On Introduction to Apache Airflow",
+        "duration": "APR 2024 - APR 2024",
+        "description": "Practical introduction to Apache Airflow for building, scheduling, and monitoring data pipelines with DAGs, operators, and best practices for maintainable workflows."
+    },
+    {
+        "school": "MOOC at Udemy",
+        "course": "Manual Software Testing: Complete Course with Practical Labs",
+        "duration": "APR 2024 - APR 2024",
+        "description": "Covered fundamentals of manual software testing, including test planning, test case design, regression testing, and hands-on labs to practice QA techniques."
     }
-    
-]'''
+]
+'''
